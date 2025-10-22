@@ -8,15 +8,13 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="w-full min-h-[80vh] flex items-center">
-       <div className="w-full rounded-2xl shadow-lg border border-white/20 overflow-hidden">
+          <div className="w-full rounded-2xl shadow-lg border border-white/20 overflow-hidden relative">
 
           <div
-            className="flex flex-col md:flex-row items-center justify-between gap-8"
+            className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10"
             style={{
-            background: "linear-gradient(90deg,  #4AA47A 0%, #1C3E2E 100%), url('/assets/tree1.png')",
-            backgroundRepeat: "no repeat",
-            backgroundSize: "250px auto",  
-            backgroundPosition: "right center",
+            background: "linear-gradient(90deg,  #4AA47A 0%, #1C3E2E 100%)",
+          
              opacity: 0.95,
 
           }}
@@ -53,7 +51,26 @@ export default function Home() {
               />
             </div>
           </div>
-        </div>
+          {/* Decorative tree elements */} 
+             <div className="absolute inset-0 pointer-events-none -z-10 opacity-40">
+              <img  
+                 src="/assets/tree1.png" 
+                 alt="" 
+                 className="absolute bottom-10 right-32 h-56 w-auto brightness-90"
+               />
+               <img 
+                 src="/assets/tree1.png" 
+                 alt="" 
+                 className="absolute top-20 right-56 h-44 w-auto brightness-90"
+               />
+                <img 
+                  src="/assets/tree1.png" 
+                   alt="" 
+                   className="absolute bottom-32 right-72 h-36 w-auto brightness-90"
+                 />
+                 </div>
+
+         </div>
       </section>
 
       <Footer />
