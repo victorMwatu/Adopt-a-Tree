@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-10 max-w-7xl mx-auto">
 
         {/* Left Section - Logo + Tagline */}
-     <div className="flex flex-col items-center md:items-start -mt-6">
+     <div className="flex flex-col items-center md:items-start -mt-12">
 
           <img
             src="/assets/logo1.png"
@@ -19,21 +19,21 @@ const Footer = () => {
 
         {/* Middle Section - Navigation + Copyright */}
         <div className="flex flex-col items-center text-center">
-          <div className="flex justify-center gap-[8rem] text-base font-medium">
+          <div className="flex justify-center gap-[13rem] text-base font-medium mt-3" >
             <p>Home</p>
             <p>About Us</p>
             <p>How it Works</p>
           </div>
-          <p className="text-sm md:text-base mt-8 font-normal tracking-wide leading-relaxed ">
+          <p className="text-sm md:text-base mt-11 font-normal tracking-wide leading-relaxed ">
             Copyright 2025 Adopt a Tree. All rights reserved
           </p>
         </div>
 
         {/* Right Section - Location */}
         <div className="flex flex-col items-center md:items-end text-sm leading-tight">
-          <p className="font-semibold text-[#F5EF67]">Adopt a Tree.</p>
-          <p>Nairobi,</p>
-          <p>Kenya</p>
+          <p className="font-semibold text-[#F5EF67] mt-3">Adopt a Tree.</p>
+          <p className="mt-2">Nairobi,</p>
+          <p className="mt-2">Kenya</p>
         </div>
 
       </div>
