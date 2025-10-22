@@ -73,6 +73,53 @@ export default function Home() {
          </div>
       </section>
 
+          {/* How It Works Section */}
+         <section className="w-full py-16 px-4 bg-white">
+            <h2 className="text-4xl md:text-5xl font-bold text-center text-black mb-12">
+              How It Works
+            </h2>
+
+            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Card 1 */}
+              <div className="bg-[#E8F5E9] rounded-2xl p-8">
+                <div className="w-16 h-16 mb-4">
+                  <img src="/assets/account-icon.png" alt="Create Account" className="w-full h-full object-contain" />
+                </div>
+                <h3 className="text-xl font-bold text-black mb-3">
+                  Create an Account
+                </h3>
+                <p className="text-black leading-relaxed">
+                  Sign up and tell us your region to get personalized tree recommendations
+                </p>
+              </div>
+
+              {/* Card 2 */}
+              <div className="bg-[#E8F5E9] rounded-2xl p-8">
+                <div className="w-16 h-16 mb-4">
+                  <img src="/assets/tree-icon.png" alt="Adopt Tree" className="w-full h-full object-contain" />
+                </div>
+                <h3 className="text-xl font-bold text-black mb-3">
+                  Adopt a Tree
+                </h3>
+                <p className="text-black leading-relaxed">
+                  Choose from AI-recommended trees perfect for your area
+                </p>
+              </div>
+
+              {/* Card 3 */}
+              <div className="bg-[#E8F5E9] rounded-2xl p-8">
+                <div className="w-16 h-16 mb-4">
+                  <img src="/assets/impact-icon.png" alt="Track Impact" className="w-full h-full object-contain" />
+                </div>
+                <h3 className="text-xl font-bold text-black mb-3">
+                  Track Impact
+                </h3>
+                <p className="text-black leading-relaxed">
+                  Monitor your tree's growth, CO₂ offset, and climb the leaderboard
+                </p>
+              </div>
+            </div>
+          </section>
       <Footer />
     </main>
   );
