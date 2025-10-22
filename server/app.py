@@ -1,13 +1,20 @@
 from flask import Flask
 from flask_cors import CORS
 from config import Config
-from models import db
+from flask_migrate import Migrate
+from models import db, bcrypt
+from flask_jwt_extended import JWTManager
+from auth import auth_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
-
 CORS(app)
 db.init_app(app)
+bcrypt.init_app(app)
+jwt = JWTManager(app)
+migrate = Migrate(app, db)
+
+app.register_blueprint(auth_bp, url_prefix="/api/auth")
 
 @app.route('/')
 def home():
