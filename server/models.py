@@ -129,4 +129,41 @@ class UserTree(db.Model):
     def __repr__(self):
         return f'<UserTree user_id={self.user_id} tree_id={self.tree_id}>'
     
+
+class AIInsight(db.Model):
+    """
+    AIInsight Model - Stores AI-generated recommendations and insights
+    """
+    __tablename__ = 'ai_insights'
     
+    # Primary Key
+    id = db.Column(db.Integer, primary_key=True)
+    
+    # Foreign Keys
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
+    tree_id = db.Column(db.Integer, db.ForeignKey('trees.id'), nullable=True)  
+    user_tree_id = db.Column(db.Integer, db.ForeignKey('user_trees.id'), nullable=True) 
+
+    # Insight Content
+    message = db.Column(db.Text, nullable=False)
+    insight_type = db.Column(db.String(50), nullable=True)  # recommendation, care_tip, motivation, impact_summary
+    
+    # Metadata
+    ai_model_used = db.Column(db.String(50), nullable=True)  # e.g., gpt-4, huggingface-bart
+    is_read = db.Column(db.Boolean, default=False)   
+    
+    def mark_as_read(self):
+        """Mark insight as read by user"""
+        self.is_read = True
+        db.session.commit()
+    
+    @staticmethod
+    def get_user_insights(user_id, limit=5):
+        """Fetch recent insights for a user"""
+        return AIInsight.query.filter_by(user_id=user_id)\
+            .order_by(AIInsight.created_at.desc())\
+            .limit(limit)\
+            .all()
+    
+    def __repr__(self):
+        return f'<AIInsight user_id={self.user_id} type={self.insight_type}>'
