@@ -24,11 +24,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-       <body className="flex min-h-screen flex-col items-center justify-between ">
+       <body>
        <AuthProvider>
-          <Navbar />
           {children}
-          <Footer />
         </AuthProvider>
       </body> 
     </html>
