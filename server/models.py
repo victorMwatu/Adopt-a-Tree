@@ -70,3 +70,63 @@ class Tree(db.Model):
     
     def __repr__(self):
         return f'<Tree {self.species_name}>'
+
+class UserTree(db.Model):
+
+    __tablename__ = 'user_trees'
+
+    # Primary Key
+    id = db.Column(db.Integer, primary_key=True)
+    
+    # Foreign Keys
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
+    tree_id = db.Column(db.Integer, db.ForeignKey('trees.id'), nullable=False, index=True)
+    
+
+    # Adoption Information
+    date_adopted = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    date_planted = db.Column(db.DateTime, nullable=True)
+    location = db.Column(db.String(200), nullable=True)
+
+    
+    # Tree Status & Progress
+    co2_offset = db.Column(db.Float, default=0.0)  
+    growth_stage = db.Column(db.String(50), default='pending')  
+    status = db.Column(db.String(50), default='pending_confirmation')
+    
+    # Relationships
+    ai_insights = db.relationship('AIInsight', backref='user_tree', lazy=True)
+
+    def calculate_co2_offset(self):
+        """
+        Calculate dynamic CO₂ offset based on tree age
+        Formula: avg_co2_absorption * (days_alive / 365)
+        """
+        if self.date_planted:
+            days_alive = (datetime.utcnow() - self.date_planted).days
+        else:
+            days_alive = (datetime.utcnow() - self.date_adopted).days
+        
+        years_alive = days_alive / 365.0
+        return self.tree.avg_co2_absorption * years_alive
+    
+    def get_tree_age_days(self):
+        """Get the age of the tree in days"""
+        reference_date = self.date_planted if self.date_planted else self.date_adopted
+        return (datetime.utcnow() - reference_date).days
+    
+    def update_growth_stage(self):
+        """Auto-update growth stage based on tree age"""
+        days = self.get_tree_age_days()
+        
+        if days < 30:
+            self.growth_stage = 'seedling'
+        elif days < 365:
+            self.growth_stage = 'young'
+        else:
+            self.growth_stage = 'mature'
+    
+    def __repr__(self):
+        return f'<UserTree user_id={self.user_id} tree_id={self.tree_id}>'
+    
+    
