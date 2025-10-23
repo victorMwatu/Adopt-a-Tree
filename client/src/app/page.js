@@ -7,7 +7,7 @@ export default function Home() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="w-full min-h-[80vh] flex items-center">
+      <section className="w-full min-h-[80vh] flex items-center bg-white">
           <div className="w-full rounded-2xl shadow-lg border border-white/20 overflow-hidden relative">
 
           <div
@@ -81,43 +81,49 @@ export default function Home() {
 
             <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Card 1 */}
-              <div className="bg-[#E8F5E9] rounded-2xl p-8">
-                <div className="w-16 h-16 mb-4">
-                  <img src="/assets/account-icon.png" alt="Create Account" className="w-full h-full object-contain" />
+                <div className="bg-[#E8F5E9] rounded-2xl p-8">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-16 h-16 bg-[#C8E6C9] rounded-full flex items-center justify-center p-3">
+                    <img src="/assets/account-icon.png" alt="Create Account" className="w-full h-full object-contain" />
+                  </div>
+                  <h3 className="text-xl font-bold text-black">
+                    Create an Account
+                  </h3>
                 </div>
-                <h3 className="text-xl font-bold text-black mb-3">
-                  Create an Account
-                </h3>
                 <p className="text-black leading-relaxed">
                   Sign up and tell us your region to get personalized tree recommendations
                 </p>
               </div>
 
-              {/* Card 2 */}
+             {/* Card 2 */}
               <div className="bg-[#E8F5E9] rounded-2xl p-8">
-                <div className="w-16 h-16 mb-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-16 h-16 bg-[#C8E6C9] rounded-full flex items-center justify-center p-3">
                   <img src="/assets/tree-icon.png" alt="Adopt Tree" className="w-full h-full object-contain" />
                 </div>
-                <h3 className="text-xl font-bold text-black mb-3">
+                <h3 className="text-xl font-bold text-black">
                   Adopt a Tree
                 </h3>
-                <p className="text-black leading-relaxed">
-                  Choose from AI-recommended trees perfect for your area
-                </p>
               </div>
+              <p className="text-black leading-relaxed">
+                Choose from AI-recommended trees perfect for your area
+              </p>
+            </div>
 
-              {/* Card 3 */}
+            {/* Card 3 */}
               <div className="bg-[#E8F5E9] rounded-2xl p-8">
-                <div className="w-16 h-16 mb-4">
-                  <img src="/assets/impact-icon.png" alt="Track Impact" className="w-full h-full object-contain" />
-                </div>
-                <h3 className="text-xl font-bold text-black mb-3">
-                  Track Impact
-                </h3>
-                <p className="text-black leading-relaxed">
-                  Monitor your tree's growth, CO₂ offset, and climb the leaderboard
-                </p>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-16 h-16 bg-[#C8E6C9] rounded-full flex items-center justify-center p-3">
+                <img src="/assets/impact-icon.png" alt="Track Impact" className="w-full h-full object-contain" />
               </div>
+              <h3 className="text-xl font-bold text-black">
+                Track Impact
+              </h3>
+            </div>
+            <p className="text-black leading-relaxed">
+              Monitor your tree's growth, CO₂ offset, and climb the leaderboard
+            </p>
+          </div>
             </div>
           </section>
       <Footer />
