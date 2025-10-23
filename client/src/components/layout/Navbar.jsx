@@ -36,7 +36,7 @@ const Navbar = () => {
           <span className="font-medium">Hi, {user.name}</span>
           <button
             onClick={handleLogout}
-            className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
+            className="bg-green-600 text-white cursor-pointer px-3 py-1 rounded hover:bg-green-700 transition"
           >
             Logout
           </button>
@@ -45,13 +45,13 @@ const Navbar = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/auth/login")}
-            className="text-green-700 hover:underline"
+            className="text-green-700 cursor-pointer hover:underline"
           >
             Login
           </button>
           <button
             onClick={() => router.push("/auth/signup")}
-            className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
+            className="bg-green-600 text-white px-3 py-1 cursor-pointer rounded hover:bg-green-700 transition"
           >
             Signup
           </button>
