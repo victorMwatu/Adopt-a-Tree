@@ -28,6 +28,7 @@ flask-sqlalchemy = "*"
 flask-bcrypt = "*"
 flask-migrate = "*"
 psycopg2-binary = "*"
+flask-cors = "*"
 
 [dev-packages]
 
