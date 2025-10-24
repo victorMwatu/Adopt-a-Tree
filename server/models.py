@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from datetime import datetime
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -48,7 +49,7 @@ class Tree(db.Model):
     __tablename__ = 'trees'
 
      # Primary Key
-    id = db.Column(db.integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
     # Tree Information
     species_name = db.Column(db.String(100), nullable=False, index=True)
