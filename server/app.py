@@ -10,7 +10,14 @@ from routes import tree_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
-CORS(app)
+CORS(app, resources={
+    r"/api/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "expose_headers": ["Content-Type", "Authorization"]
+    }
+})
 db.init_app(app)
 bcrypt.init_app(app)
 jwt = JWTManager(app)
