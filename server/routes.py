@@ -32,7 +32,7 @@ def get_user_trees(user_id):
         db.session.commit()
 
         age_days = user_tree.get_tree_age_days()
-        progress = min(round((age_days / 1095) * 100, 1), 100)  
+        progress = min(round((age_days / 1095) * 100, 1), 100) 
 
         if user_tree.growth_stage.lower() == "seedling":
             icon = "🌱"

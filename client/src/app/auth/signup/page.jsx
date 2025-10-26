@@ -7,6 +7,7 @@ import Navbar from "../../../components/layout/Navbar";
 export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [region, setRegion] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const { login } = useAuth();
@@ -20,7 +21,7 @@ export default function SignupPage() {
       const res = await fetch("http://127.0.0.1:5000/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, region, password }),
       });
 
       const data = await res.json();
@@ -69,6 +70,19 @@ export default function SignupPage() {
               className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-xl font-medium mb-1 text-gray-800">
+              Region
+            </label>
+            <input
+              type="text"
+              placeholder="Enter your full name"
+              className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
+              value={region}
+              onChange={(e) => setRegion(e.target.value)}
             />
           </div>
 
