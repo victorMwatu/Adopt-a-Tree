@@ -12,16 +12,17 @@ auth_bp = Blueprint("auth", __name__)
 def signup():
     data = request.get_json() or {}
     name = data.get("name")
+    region = data.get("region")
     email = data.get("email")
     password = data.get("password")
 
-    if not name or not email or not password:
+    if not name or not region or not email or not password:
         return jsonify({"message": "Name, Email, and Password are required"}), 400
 
     if User.query.filter_by(email=email).first():
         return jsonify({"message": "Email already used to register an account"}), 400
 
-    user = User(name=name, email=email)
+    user = User(name=name, region=region, email=email)
     user.set_password(password)
     db.session.add(user)
     db.session.commit()
@@ -45,5 +46,5 @@ def login():
     token = create_access_token(identity=user.id, expires_delta=timedelta(hours=24))
     return jsonify({
         "token": token,
-        "user": {"id": user.id, "name": user.name, "email": user.email}
+        "user": {"id": user.id, "name": user.name, "region": user.region, "email": user.email}
     }), 200
