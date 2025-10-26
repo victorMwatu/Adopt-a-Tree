@@ -45,6 +45,92 @@ const Adopt = () => {
     }
   };
 
+  const handleSelectTree = async (treeId, treeName) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        alert('Please login to adopt a tree');
+        return;
+      }
+
+      const response = await fetch('http://localhost:5000/api/trees/adopt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          tree_id: treeId,
+          location: `${selectedRegion}, Kenya`
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert(`🌳 ${treeName} adopted successfully!`);
+        setSelectedTree(treeId);
+        
+      } else {
+        alert(data.message || 'Failed to adopt tree');
+      }
+    } catch (err) {
+      console.error('Error adopting tree:', err);
+      alert('Failed to adopt tree. Please try again.');
+    }
+  };
+
+  const handleSuggestTree = async () => {
+    const treeName = prompt('What tree would you like to suggest?');
+    
+    if (!treeName) return;
+    
+    const description = prompt('Tell us more about this tree (optional):');
+    
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        alert('Please login to suggest a tree');
+        return;
+      }
+
+      const response = await fetch('http://localhost:5000/api/trees/suggest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          tree_name: treeName,
+          description: description || ''
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert('✅ Tree suggestion submitted successfully!');
+      } else {
+        alert(data.message || 'Failed to submit suggestion');
+      }
+    } catch (err) {
+      console.error('Error suggesting tree:', err);
+      alert('Failed to submit suggestion. Please try again.');
+    }
+  };
+
+  const getTreeIcon = (name) => {
+    const iconMap = {
+      'Cedar': '🌲',
+      'Acacia': '🌳',
+      'Olive': '🫒'
+    };
+    return iconMap[name] || '🌳';
+  };
+
+
     </div>
      </main>
   );
