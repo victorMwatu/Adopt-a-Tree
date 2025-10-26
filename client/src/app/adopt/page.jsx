@@ -190,7 +190,8 @@ const Adopt = () => {
           </div>
         </div>
 
-               
+      
+                          
       </div>
     </div>
      </main>
