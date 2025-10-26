@@ -130,7 +130,68 @@ const Adopt = () => {
     return iconMap[name] || '🌳';
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-100 via-pink-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-5xl mb-4">🌳</div>
+          <p className="text-gray-600">Loading trees...</p>
+        </div>
+      </div>
+    );
+  }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-100 via-pink-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-5xl mb-4">⚠️</div>
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={fetchTrees}
+            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <main className="flex min-h-screen flex-col ">
+      <Navbar />
+    <div className="min-h-screen bg-white">
+      
+
+      <div className="relative max-w-6xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">Select Your Tree</h1>
+          <p className="text-gray-600 mb-6">Recommendations for {selectedRegion}, Kenya.</p>
+          
+          
+          <div className="max-w-md mx-auto">
+            <label htmlFor="region" className="block text-sm font-medium text-gray-700 mb-2">
+              Select Your Region
+            </label>
+            <select
+              id="region"
+              value={selectedRegion}
+              onChange={(e) => setSelectedRegion(e.target.value)}
+              className="w-full px-4 py-3 border-2 border-green-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-800 font-medium"
+            >
+              {kenyanCounties.map((county) => (
+                <option key={county} value={county}>
+                  {county}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+               
+      </div>
     </div>
      </main>
   );
