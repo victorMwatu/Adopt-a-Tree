@@ -98,7 +98,7 @@ def create_auth_blueprint(mail):
             db.session.commit()
             print(f"Token generated: {token}") 
             
-            reset_link = f"http://localhost:3000/auth/reset-password?token={token}"
+            reset_link = f"http://localhost:3000/auth/resetpassword?token={token}"
             
             try:
                 msg = Message(
