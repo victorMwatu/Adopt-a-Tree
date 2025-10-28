@@ -69,17 +69,23 @@ export default function Dashboard() {
 
                 if (insightRes.ok) {
                   const insight = await insightRes.json();
-                  fetchedInsights.push(insight);
+                  if (insight.message && insight.message.trim() !== "") {
+                    fetchedInsights.push(insight);
+                  }
                 }
+
               } catch (err) {
                 console.error("Error fetching AI insight:", err);
               }
             }
 
             // Save new tips
-            setAiTips(fetchedInsights);
-            localStorage.setItem("aiTips", JSON.stringify(fetchedInsights));
-            localStorage.setItem("lastAITipsFetch", now.toString());
+            if (fetchedInsights.length > 0) {
+              setAiTips(fetchedInsights);
+              localStorage.setItem("aiTips", JSON.stringify(fetchedInsights));
+              localStorage.setItem("lastAITipsFetch", now.toString());
+            }
+
           }
         } else {
           //Load cached tips if still valid
