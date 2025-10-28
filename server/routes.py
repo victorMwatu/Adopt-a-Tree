@@ -1,11 +1,12 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models import db, UserTree, Tree, AIInsight
 from datetime import datetime
-from flask import request
-from models import AIInsight
-from sqlalchemy import cast, String
+import json, re, requests, os
+from dotenv import load_dotenv
+from huggingface_hub import InferenceClient
 
+load_dotenv()
 
 tree_bp = Blueprint("tree_bp", __name__)
 
@@ -53,99 +54,81 @@ def get_user_trees(user_id):
 
     return jsonify(updated_trees)
 
+HF_API_KEY = os.getenv("HF_API_KEY")
+hf_client = InferenceClient(token=HF_API_KEY)
 
-@tree_bp.route("/api/trees/available", methods=["GET"])
-def get_available_trees():
+@tree_bp.route("/api/tree-suggestions", methods=["POST"])
+def tree_suggestions():
     """
-    Get all available trees for adoption with optional region filtering
+    Get tree suggestions or tree info using Hugging Face Chat API.
+    - If `region` is provided: suggest 3–5 trees for that region.
+    - If `tree_name` is provided: return info about that specific tree.
     """
-    region = request.args.get('region')
-    
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Missing JSON body"}), 400
+
+    region = data.get("region")
+    tree_name = data.get("tree_name")
+
+    if not region and not tree_name:
+        return jsonify({"error": "Please provide either 'region' or 'tree_name'."}), 400
+
+    # Prompt builder
     if region:
-        # For PostgreSQL JSON, use proper JSON operators
-        from sqlalchemy import cast, String
-        trees = Tree.query.filter(
-            cast(Tree.suitable_regions, String).like(f'%{region}%')
-        ).all()
+        prompt = f"""
+        Suggest 3 to 5 tree species suitable for the region: {region}.
+        For each, return a JSON array of objects with:
+        - species_name
+        - scientific_name
+        - avg_co2_absorption (in kg per year)
+        - description
+        - suitable_regions
+        - sunlight_requirement
+        - water_needs
+        - drought_resistant (true/false)
+        - growth_rate
+        - mature_height_meters
+        Respond strictly as JSON.
+        """
     else:
-        trees = Tree.query.all()
-    
-    return jsonify([{
-        "id": tree.id,
-        "name": tree.species_name,
-        "scientific_name": tree.scientific_name,
-        "description": tree.description,
-        "habitat": tree.suitable_regions[0] if tree.suitable_regions else "Various",
-        "growth_rate": tree.growth_rate or "Medium growing",
-        "water_needs": tree.water_needs or "Medium water",
-        "co2_absorption": tree.avg_co2_absorption,
-        "sunlight": tree.sunlight_requirement,
-        "drought_resistant": tree.drought_resistant
-    } for tree in trees])
+        prompt = f"""
+        Provide full details for the tree '{tree_name}'.
+        Respond in JSON format with these fields:
+        - species_name
+        - scientific_name
+        - avg_co2_absorption (in kg per year)
+        - description
+        - suitable_regions
+        - sunlight_requirement
+        - water_needs
+        - drought_resistant (true/false)
+        - growth_rate
+        - mature_height_meters
+        """
 
-@tree_bp.route("/api/trees/adopt", methods=["POST"])
-@jwt_required()
-def adopt_tree():
-    """
-    Adopt a tree for the current user
-    """
-    current_user_id = get_jwt_identity()
-    data = request.get_json()
-    
-    tree_id = data.get('tree_id')
-    location = data.get('location', 'Nairobi, Kenya')
-    
-    if not tree_id:
-        return jsonify({"message": "tree_id is required"}), 400
-    
-    # Check if tree exists
-    tree = Tree.query.get(tree_id)
-    if not tree:
-        return jsonify({"message": "Tree not found"}), 404
-    
-    # Create adoption
-    user_tree = UserTree(
-        user_id=current_user_id,
-        tree_id=tree_id,
-        location=location,
-        growth_stage='seedling',
-        status='pending_confirmation'
-    )
-    
-    db.session.add(user_tree)
-    db.session.commit()
-    
-    return jsonify({
-        "message": "Tree adopted successfully!",
-        "adoption_id": user_tree.id,
-        "tree_name": tree.species_name
-    }), 201
+    try:
+        # Make the serverless chat completion request
+        completion = hf_client.chat.completions.create(
+            model="deepseek-ai/DeepSeek-V3-0324",  # Free serverless model
+            messages=[
+                {"role": "system", "content": "You are a helpful forestry assistant that outputs only JSON."},
+                {"role": "user", "content": prompt}
+            ]
+        )
 
+        output_text = completion.choices[0].message.content
 
-@tree_bp.route("/api/trees/suggest", methods=["POST"])
-@jwt_required()
-def suggest_tree():
-    """
-    Allow users to suggest a tree not in the database
-    You can store this in a separate TreeSuggestion table or use AIInsight
-    """
-    current_user_id = get_jwt_identity()
-    data = request.get_json()
-    
-    tree_name = data.get('tree_name')
-    description = data.get('description', '')
-    
-    if not tree_name:
-        return jsonify({"message": "tree_name is required"}), 400
-    
-    
-    suggestion = AIInsight(
-        user_id=current_user_id,
-        message=f"Tree Suggestion: {tree_name}. Description: {description}",
-        insight_type='tree_suggestion'
-    )
-    
-    db.session.add(suggestion)
-    db.session.commit()
-    
-    return jsonify({"message": "Tree suggestion submitted successfully!"}), 201
+        # Safely parse JSON from model output
+        try:
+            parsed = json.loads(output_text)
+        except json.JSONDecodeError:
+            match = re.search(r"(\[.*\]|\{.*\})", output_text, re.DOTALL)
+            parsed = json.loads(match.group()) if match else {"raw_output": output_text}
+
+        return jsonify(parsed)
+
+    except Exception as e:
+        print("LLM Error:", e)
+        return jsonify({"error": str(e)}), 500
