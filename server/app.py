@@ -5,8 +5,7 @@ from config import Config
 from flask_migrate import Migrate
 from models import db, bcrypt
 from flask_jwt_extended import JWTManager
-from auth import auth_bp
-from routes import tree_bp
+
 
 
 app = Flask(__name__)
@@ -24,15 +23,22 @@ bcrypt.init_app(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'your-email@gmail.com'  
-app.config['MAIL_PASSWORD'] = 'your-app-password'     
-app.config['MAIL_DEFAULT_SENDER'] = 'your-email@gmail.com'
+app.config['MAIL_USERNAME'] = 'fuchakamichael06@gmail.com'  
+app.config['MAIL_PASSWORD'] = 'aguc towz hhoh zyur'     
+app.config['MAIL_DEFAULT_SENDER'] = 'fuchakamichael06@gmail.com'
 
 mail = Mail(app)
 
-if not app.config.get('MAIL_USERNAME') or app.config.get('MAIL_USERNAME') == 'your-email@gmail.com':
+if not app.config.get('MAIL_USERNAME') or app.config.get('MAIL_USERNAME') == 'fuchakamichael06@gmail.com':
     print("⚠️  WARNING: Configure MAIL_USERNAME and MAIL_PASSWORD for email functionality")
     
+
+from auth import create_auth_blueprint
+from routes import tree_bp
+
+auth_bp = create_auth_blueprint(mail)
+
+
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
 

@@ -25,7 +25,7 @@ export default function ForgotPasswordPage() {
       if (res.ok) {
         setIsSuccess(true);
         setMessage(data.message);
-        setEmail(""); // Clear email field
+        setEmail(""); 
       } else {
         setIsSuccess(false);
         setMessage(data.message || "Something went wrong");
