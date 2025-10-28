@@ -45,6 +45,67 @@ export default function Dashboard() {
     fetchTrees();
   }, [user]);
 
+  const handlePlanting = async (treeId) => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`http://localhost:5000/api/trees/${treeId}/confirm`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) throw new Error("Failed to confirm planting");
+
+    const updated = await res.json();
+
+    
+    setTrees((prev) =>
+      prev.map((t) =>
+        t.id === treeId
+          ? {
+              ...t,
+              status: "confirmed",
+              growth_stage: "Seedling",
+              progress: 0, 
+            }
+          : t
+      )
+    );
+
+    alert("🌱 Tree planting confirmed successfully!");
+  } catch (err) {
+    console.error("Error confirming planting:", err);
+    alert("Failed to confirm planting. Please try again.");
+  }
+};
+
+const handleDelete = async (treeId) => {
+  const confirmDelete = window.confirm("Are you sure you want to delete this tree? This action cannot be undone.");
+  if (!confirmDelete) return;
+
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`http://localhost:5000/api/trees/${treeId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) throw new Error("Failed to delete tree");
+
+    setTrees((prev) => prev.filter((t) => t.id !== treeId));
+    alert("🗑️ Tree deleted successfully.");
+  } catch (err) {
+    console.error("Error deleting tree:", err);
+    alert("Failed to delete tree. Please try again.");
+  }
+};
+
+
+
   return (
     <main className="min-h-screen bg-gray-50">
       <Sidebar />
@@ -94,15 +155,15 @@ export default function Dashboard() {
 
                       {tree.status === "pending_confirmation" && (
                         <div className="flex gap-2 mt-3">
-                          <button className="flex-1 px-3 py-2 bg-green-500 text-white rounded-lg text-xs font-medium hover:bg-green-600 transition-colors">
+                          <button onClick={() => handlePlanting(tree.id)} className="flex-1 px-3 py-2 bg-green-500 text-white rounded-lg text-xs font-medium hover:bg-green-600 transition-colors">
                             Confirm Planting
                           </button>
                         </div>
                       )}
 
-                      {tree.status === "active" && (
+                      {tree.status === "confirmed" && (
                         <div className="flex gap-2 mt-3">
-                          <button className="flex-1 px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 transition-colors">
+                          <button onClick={() => handleDelete(tree.id)} className="flex-1 px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 transition-colors">
                             Delete
                           </button>
                         </div>
