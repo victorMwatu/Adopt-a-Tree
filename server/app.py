@@ -12,7 +12,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 CORS(app, resources={
     r"/api/*": {
-        "origins": "*",
+        "origins": "*", # NOTE TO TEAM: Change to frontend URL in production
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
         "expose_headers": ["Content-Type", "Authorization"]
