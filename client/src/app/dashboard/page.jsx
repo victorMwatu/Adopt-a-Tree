@@ -288,11 +288,15 @@ const handleDelete = async (treeId) => {
 
             {/* ===================== Quick Actions Section ===================== */}
             <div className="flex gap-4 flex-wrap">
-              <button className="flex-1 min-w-fit px-6 py-4 bg-gradient-to-br from-green-500 to-green-400 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+              <button 
+              onClick={() => router.push('/adopt')}
+              className="flex-1 min-w-fit px-6 py-4 bg-gradient-to-br from-green-500 to-green-400 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
                 <span>Adopt New Tree</span>
               </button>
 
-              <button className="flex-1 min-w-fit px-6 py-4 bg-white text-green-600 border-2 border-green-500 rounded-xl font-semibold hover:bg-green-50 transition-colors flex items-center justify-center gap-2">
+              <button 
+               onClick={() => router.push('/leaderboard')}
+              className="flex-1 min-w-fit px-6 py-4 bg-white text-green-600 border-2 border-green-500 rounded-xl font-semibold hover:bg-green-50 transition-colors flex items-center justify-center gap-2">
                 <span>View Leaderboard</span>
               </button>
             </div>

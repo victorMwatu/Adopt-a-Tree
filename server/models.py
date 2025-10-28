@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from datetime import datetime
+from datetime import datetime, timedelta
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -14,6 +14,8 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(128), nullable=False)
     region = db.Column(db.String(100), nullable=True)
+    reset_token = db.Column(db.String(100), nullable=True, unique=True)
+    reset_token_expiry = db.Column(db.DateTime, nullable=True)
 
 
      # Timestamps
@@ -42,6 +44,20 @@ class User(db.Model):
     
     def __repr__(self):
         return f'<User {self.email}>'
+        
+    def set_reset_token(self, token):
+        """Set password reset token with 1-hour expiry"""
+        self.reset_token = token
+        self.reset_token_expiry = datetime.utcnow() + timedelta(hours=1)
+
+    def check_reset_token(self, token):
+        """Verify reset token is valid and not expired"""
+        if self.reset_token != token:
+            return False
+        if datetime.utcnow() > self.reset_token_expiry:
+            return False
+        return True
+
 
 class Tree(db.Model):
 

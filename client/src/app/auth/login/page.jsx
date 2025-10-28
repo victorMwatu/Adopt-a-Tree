@@ -70,6 +70,12 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <a 
+          href="/auth/forgotpassword" 
+          className="text-sm text-green-600 hover:underline mt-1 self-end"
+        >
+          Forgot password?
+        </a>
           </div>
 
           <button
@@ -83,6 +89,12 @@ export default function LoginPage() {
             <p className="text-center text-red-500 text-sm mt-2">{message}</p>
           )}
         </form>
+        <p className="text-center text-gray-600 mt-6">
+        Don't have an account?{" "}
+        <a href="/auth/signup" className="text-green-600 font-medium hover:underline">
+          Sign up
+        </a>
+      </p>
       </div>
     </main>
   );
