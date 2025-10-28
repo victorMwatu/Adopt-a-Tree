@@ -3,7 +3,9 @@ from flask_jwt_extended import create_access_token
 from datetime import timedelta
 from models import db, User
 from flask_bcrypt import Bcrypt
-
+import secrets  
+from flask_mail import Message  
+from app import mail  
 bcrypt = Bcrypt()
 
 auth_bp = Blueprint("auth", __name__)
@@ -68,3 +70,83 @@ def login():
     except Exception as e:
         print(f"Error in login: {str(e)}")
         return jsonify({"message": "An error occurred during login", "error": str(e)}), 500
+
+        
+    
+@auth_bp.route("/forgot-password", methods=["POST", "OPTIONS"])
+def forgot_password():
+    if request.method == "OPTIONS":
+        return '', 204
+    
+    try:
+        data = request.get_json()
+        email = data.get("email")
+        
+        if not email:
+            return jsonify({"message": "Email is required"}), 400
+        
+        user = User.query.filter_by(email=email).first()
+        
+        if not user:
+            # Don't reveal if email exists 
+            return jsonify({"message": "If email exists, reset link will be sent"}), 200
+        
+        # Generate reset token
+        token = secrets.token_urlsafe(32)
+        user.set_reset_token(token)
+        db.session.commit()
+        
+        # Send email with reset link
+        reset_link = f"http://localhost:3000/auth/reset-password?token={token}"
+        
+        try:
+            msg = Message(
+                subject="Password Reset Request",
+                recipients=[user.email],
+                body=f"Click this link to reset your password: {reset_link}\n\nThis link expires in 1 hour."
+            )
+            mail.send(msg)
+        except Exception as e:
+          
+            print(f"\n=== PASSWORD RESET EMAIL ===")
+            print(f"To: {user.email}")
+            print(f"Reset Link: {reset_link}")
+            print(f"========================\n")
+        
+        return jsonify({"message": "If email exists, reset link will be sent"}), 200
+        
+    except Exception as e:
+        print(f"Error in forgot-password: {str(e)}")
+        return jsonify({"message": "An error occurred"}), 500
+    
+
+@auth_bp.route("/reset-password", methods=["POST", "OPTIONS"])
+def reset_password():
+    if request.method == "OPTIONS":
+        return '', 204
+    
+    try:
+        data = request.get_json()
+        token = data.get("token")
+        new_password = data.get("password")
+        
+        if not token or not new_password:
+            return jsonify({"message": "Token and new password are required"}), 400
+        
+        # Find user with valid token
+        user = User.query.filter_by(reset_token=token).first()
+        
+        if not user or not user.check_reset_token(token):
+            return jsonify({"message": "Invalid or expired reset token"}), 400
+        
+        
+        user.set_password(new_password)
+        user.reset_token = None
+        user.reset_token_expiry = None
+        db.session.commit()
+        
+        return jsonify({"message": "Password reset successfully"}), 200
+        
+    except Exception as e:
+        print(f"Error in reset-password: {str(e)}")
+        return jsonify({"message": "An error occurred"}), 500

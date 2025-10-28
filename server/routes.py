@@ -149,3 +149,5 @@ def suggest_tree():
     db.session.commit()
     
     return jsonify({"message": "Tree suggestion submitted successfully!"}), 201
+
+
