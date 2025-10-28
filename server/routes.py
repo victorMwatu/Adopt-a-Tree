@@ -277,3 +277,76 @@ def delete_user_tree(tree_id):
     db.session.commit()
 
     return jsonify({"message": f"Tree {tree_id} deleted successfully"}), 200
+
+@tree_bp.route("/api/ai-insight", methods=["POST"])
+@jwt_required()
+def generate_ai_insight():
+    """
+    Generate and save an AI insight for a user tree.
+    Expects JSON body with:
+    - user_tree_id (int, required)
+    - insight_type (optional, default='recommendation')
+    """
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Missing JSON body"}), 400
+
+    user_tree_id = data.get("user_tree_id")
+    insight_type = data.get("insight_type", "recommendation")
+    current_user_id = get_jwt_identity()
+
+    if not user_tree_id:
+        return jsonify({"error": "Missing user_tree_id"}), 400
+
+    # Fetch user_tree
+    user_tree = UserTree.query.filter_by(id=user_tree_id, user_id=current_user_id).first()
+    if not user_tree:
+        return jsonify({"error": "UserTree not found or unauthorized"}), 404
+
+    # Build prompt for AI
+    prompt = f"""
+    Provide a concise, helpful {insight_type} for a user who adopted the tree:
+    - Species: {user_tree.tree.species_name}
+    - Scientific Name: {user_tree.tree.scientific_name}
+    - Growth Stage: {user_tree.growth_stage}
+    - CO2 Offset: {round(user_tree.co2_offset,2)} kg
+
+    Output as plain text suitable for storing in AIInsight.message
+    """
+
+    try:
+        # Call Hugging Face serverless model
+        completion = hf_client.chat.completions.create(
+            model="deepseek-ai/DeepSeek-V3-0324",
+            messages=[
+                {"role": "system", "content": "You are a helpful forestry assistant."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        ai_message = completion.choices[0].message.content.strip()
+
+        # Save to AIInsight table
+        insight = AIInsight(
+            user_id=current_user_id,
+            tree_id=user_tree.tree.id,
+            user_tree_id=user_tree.id,
+            message=ai_message,
+            insight_type=insight_type,
+            ai_model_used="deepseek-ai/DeepSeek-V3-0324"
+        )
+
+        db.session.add(insight)
+        db.session.commit()
+
+        return jsonify({
+            "id": insight.id,
+            "user_tree_id": insight.user_tree_id,
+            "tree_name": user_tree.tree.species_name,
+            "insight_type": insight.insight_type,
+            "message": insight.message
+        })
+
+    except Exception as e:
+        print("AI Insight Error:", e)
+        return jsonify({"error": str(e)}), 500

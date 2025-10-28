@@ -8,6 +8,7 @@ export default function Dashboard() {
   const { user } = useAuth();
   const router = useRouter();
   const [trees, setTrees] = useState([]);
+  const [aiTips, setAiTips] = useState([]);
 
   //Redirect if not authenticated
   useEffect(() => {
@@ -17,32 +18,86 @@ export default function Dashboard() {
     }
   }, [user, router]);
 
-  //Fetch trees when user is ready
+  //Fetch Dashboard data when user is ready
   useEffect(() => {
     if (!user) return;
 
-    const fetchTrees = async () => {
+    const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem("token");
+
+        //Fetch all trees
         const res = await fetch(`http://localhost:5000/api/trees/${user.id}`, {
           headers: {
-            Authorization: `Bearer ${token}`,
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch trees");
-        }
-
+        if (!res.ok) throw new Error("Failed to fetch trees");
         const data = await res.json();
         setTrees(data);
+
+        //Check if AI tips need refresh (every 24h)
+        const lastFetch = localStorage.getItem("lastAITipsFetch");
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+
+        if (!lastFetch || now - parseInt(lastFetch) > oneDay) {
+          // Generate new insights
+          if (data.length > 0) {
+            const randomTrees = data.sort(() => 0.5 - Math.random()).slice(0, 2);
+            const insightTypes = ["care reminder", "recommendation"];
+            const fetchedInsights = [];
+
+            for (let i = 0; i < randomTrees.length; i++) {
+              const tree = randomTrees[i];
+              const type = insightTypes[i % insightTypes.length];
+
+              try {
+                const insightRes = await fetch("http://localhost:5000/api/ai-insight", {
+                  method: "POST",
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    user_tree_id: tree.id,
+                    insight_type: type,
+                  }),
+                });
+
+                if (insightRes.ok) {
+                  const insight = await insightRes.json();
+                  if (insight.message && insight.message.trim() !== "") {
+                    fetchedInsights.push(insight);
+                  }
+                }
+
+              } catch (err) {
+                console.error("Error fetching AI insight:", err);
+              }
+            }
+
+            // Save new tips
+            if (fetchedInsights.length > 0) {
+              setAiTips(fetchedInsights);
+              localStorage.setItem("aiTips", JSON.stringify(fetchedInsights));
+              localStorage.setItem("lastAITipsFetch", now.toString());
+            }
+
+          }
+        } else {
+          //Load cached tips if still valid
+          const cached = localStorage.getItem("aiTips");
+          if (cached) setAiTips(JSON.parse(cached));
+        }
       } catch (err) {
-        console.error("Error fetching trees:", err);
+        console.error("Error loading dashboard data:", err);
       }
     };
 
-    fetchTrees();
+    fetchDashboardData();
   }, [user]);
 
   const handlePlanting = async (treeId) => {
@@ -182,26 +237,21 @@ const handleDelete = async (treeId) => {
                 </h2>
 
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
-                    <span className="font-semibold text-blue-900 text-sm block mb-1">
-                      Care Reminder
-                    </span>
-                    <p className="text-sm text-gray-700 leading-relaxed">
-                      Your Acacia seedling needs watering! Young acacias thrive
-                      with consistent moisture in their first 3 months.
-                    </p>
-                  </div>
-
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
-                    <span className="font-semibold text-blue-900 text-sm block mb-1">
-                      Recommendation
-                    </span>
-                    <p className="text-sm text-gray-700 leading-relaxed">
-                      Based on Nairobi's climate, consider adding a
-                      drought-resistant Baobab next. It absorbs 3,000 kg CO₂ per
-                      year!
-                    </p>
-                  </div>
+                  {aiTips.length === 0 ? (
+                    <p className="text-sm text-gray-500">Loading AI insights...</p>
+                  ) : (
+                    aiTips.map((tip, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4"
+                      >
+                        <span className="font-semibold text-blue-900 text-sm block mb-1 capitalize">
+                          {tip.insight_type}
+                        </span>
+                        <p className="text-sm text-gray-700 leading-relaxed">{tip.message}</p>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
 
