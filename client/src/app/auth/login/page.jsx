@@ -71,7 +71,7 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
             <a 
-          href="/auth/forgot-password" 
+          href="/auth/forgotpassword" 
           className="text-sm text-green-600 hover:underline mt-1 self-end"
         >
           Forgot password?
