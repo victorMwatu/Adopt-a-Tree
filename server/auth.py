@@ -77,14 +77,18 @@ def create_auth_blueprint(mail):
         if request.method == "OPTIONS":
             return '', 204
         
+        print("=== FORGOT PASSWORD REQUEST RECEIVED ===")
+
         try:
             data = request.get_json()
             email = data.get("email")
+            print(f"Email received: {email}") 
             
             if not email:
                 return jsonify({"message": "Email is required"}), 400
             
             user = User.query.filter_by(email=email).first()
+            print(f"User found: {user}")
             
             if not user:
                 return jsonify({"message": "If email exists, reset link will be sent"}), 200
@@ -92,6 +96,7 @@ def create_auth_blueprint(mail):
             token = secrets.token_urlsafe(32)
             user.set_reset_token(token)
             db.session.commit()
+            print(f"Token generated: {token}") 
             
             reset_link = f"http://localhost:3000/auth/reset-password?token={token}"
             
@@ -102,11 +107,13 @@ def create_auth_blueprint(mail):
                     body=f"Click this link to reset your password: {reset_link}\n\nThis link expires in 1 hour."
                 )
                 mail.send(msg)
+                print("Email sent successfully!")
             except Exception as e:
                 print(f"\n=== PASSWORD RESET EMAIL ===")
                 print(f"To: {user.email}")
                 print(f"Reset Link: {reset_link}")
                 print(f"========================\n")
+                print(f"Email sending failed: {str(e)}") 
             
             return jsonify({"message": "If email exists, reset link will be sent"}), 200
             
