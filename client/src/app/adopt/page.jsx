@@ -91,8 +91,21 @@ const Adopt = () => {
 
       const query = mode === "region" ? { region: input } : { tree_name: input };
       const data = await getTreeSuggestions(query);
-      const dataWithIcons = data.map(tree => ({ ...tree, icon: getRandomIcon() }));
-      setTrees(dataWithIcons);
+     // Case 1: API returned an array
+      if (Array.isArray(data)) {
+        setTrees(data.map(tree => ({ ...tree, icon: getRandomIcon() })));
+      }
+      // Case 2: API returned a single tree object
+      else if (data && typeof data === "object" && data.species_name) {
+        setTrees([{ ...data, icon: getRandomIcon() }]);
+      }
+      // Case 3: API returned an error or message
+      else {
+        console.error("Unexpected data format:", data);
+        setTrees([]);
+        setError("No matching trees found or unexpected response format.");
+      }
+      
     } catch (err) {
       console.error(err);
       setError("Failed to fetch recommendations. Please try again later.");
@@ -220,7 +233,11 @@ const Adopt = () => {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+              <div  className={`relative grid gap-6 ${
+                              trees.length === 1
+                                ? "grid-cols-1 place-items-center" 
+                                : "grid-cols-1 md:grid-cols-3"
+                            }`}>
                 {trees.map(tree => (
                   <div
                     key={tree.id || tree.species_name}
