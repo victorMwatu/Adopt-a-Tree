@@ -233,3 +233,47 @@ def adopt_tree():
         "location": user_tree.location,
         "date_adopted": user_tree.date_adopted.isoformat()
     }), 201
+
+@tree_bp.route("/api/trees/<int:tree_id>/confirm", methods=["PUT"])
+@jwt_required()
+def confirm_tree_planting(tree_id):
+    """
+    Confirm that a tree has been planted by updating its UserTree record.
+    """
+    current_user_id = get_jwt_identity()
+    user_tree = UserTree.query.filter_by(id=tree_id, user_id=current_user_id).first()
+
+    if not user_tree:
+        return jsonify({"error": "Tree not found or unauthorized"}), 404
+
+    user_tree.status = "confirmed"
+    user_tree.growth_stage = "seedling"
+    user_tree.date_planted = datetime.utcnow()
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Tree planting confirmed successfully",
+        "id": user_tree.id,
+        "status": user_tree.status,
+        "growth_stage": user_tree.growth_stage,
+        "date_planted": user_tree.date_planted.isoformat()
+    }), 200
+
+
+@tree_bp.route("/api/trees/<int:tree_id>", methods=["DELETE"])
+@jwt_required()
+def delete_user_tree(tree_id):
+    """
+    Delete a user's adopted tree from UserTree model.
+    """
+    current_user_id = get_jwt_identity()
+    user_tree = UserTree.query.filter_by(id=tree_id, user_id=current_user_id).first()
+
+    if not user_tree:
+        return jsonify({"error": "Tree not found or unauthorized"}), 404
+
+    db.session.delete(user_tree)
+    db.session.commit()
+
+    return jsonify({"message": f"Tree {tree_id} deleted successfully"}), 200
