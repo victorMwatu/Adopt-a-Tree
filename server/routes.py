@@ -10,8 +10,7 @@ load_dotenv()
 
 tree_bp = Blueprint("tree_bp", __name__)
 
-# Fetch user trees
-@tree_bp.route("/api/trees/<int:user_id>", methods=["GET"])
+@tree_bp.route("/trees/<int:user_id>", methods=["GET"])
 @jwt_required()
 def get_user_trees(user_id):
     current_user_id = get_jwt_identity()
@@ -55,13 +54,18 @@ def get_user_trees(user_id):
 HF_API_KEY = os.getenv("HF_API_KEY")
 hf_client = InferenceClient(token=HF_API_KEY)
 
-@tree_bp.route("/api/tree-suggestions", methods=["POST"])
+@tree_bp.route("/tree-suggestions", methods=["POST",  "OPTIONS"])
+@jwt_required(optional=True)
 def tree_suggestions():
     """
     Get tree suggestions or tree info using Hugging Face Chat API.
     - If `region` is provided: suggest 3–5 trees for that region.
     - If `tree_name` is provided: return info about that specific tree.
+    
     """
+
+    if request.method == "OPTIONS":
+        return "", 200
 
     data = request.get_json()
     if not data:
@@ -131,7 +135,7 @@ def tree_suggestions():
         print("LLM Error:", e)
         return jsonify({"error": str(e)}), 500
 
-@tree_bp.route("/api/adopt-tree", methods=["POST"])
+@tree_bp.route("/adopt-tree", methods=["POST"])
 @jwt_required()
 def adopt_tree():
     """
@@ -232,7 +236,7 @@ def adopt_tree():
         "date_adopted": user_tree.date_adopted.isoformat()
     }), 201
 
-@tree_bp.route("/api/trees/<int:tree_id>/confirm", methods=["PUT"])
+@tree_bp.route("/trees/<int:tree_id>/confirm", methods=["PUT"])
 @jwt_required()
 def confirm_tree_planting(tree_id):
     """
@@ -259,7 +263,7 @@ def confirm_tree_planting(tree_id):
     }), 200
 
 
-@tree_bp.route("/api/trees/<int:tree_id>", methods=["DELETE"])
+@tree_bp.route("/trees/<int:tree_id>", methods=["DELETE"])
 @jwt_required()
 def delete_user_tree(tree_id):
     """
@@ -276,7 +280,7 @@ def delete_user_tree(tree_id):
 
     return jsonify({"message": f"Tree {tree_id} deleted successfully"}), 200
 
-@tree_bp.route("/api/ai-insight", methods=["POST"])
+@tree_bp.route("/ai-insight", methods=["POST"])
 @jwt_required()
 def generate_ai_insight():
     """
@@ -348,3 +352,48 @@ def generate_ai_insight():
     except Exception as e:
         print("AI Insight Error:", e)
         return jsonify({"error": str(e)}), 500
+
+
+@tree_bp.route("/leaderboard", methods=["GET"])
+def get_leaderboard():
+    """
+    Returns top 5 users by confirmed trees & total CO2 offset.
+    Includes badge (Bronze/Silver/Gold) based on oldest tree.
+    """
+    from models import User
+
+    users = User.query.all()
+    leaderboard = []
+
+    for user in users:
+        confirmed_trees = [t for t in user.trees if t.status == "confirmed"]
+        if not confirmed_trees:
+            continue
+
+        total_trees = len(confirmed_trees)
+        total_co2 = sum(t.calculate_co2_offset() for t in confirmed_trees)
+
+        max_age_days = max(t.get_tree_age_days() for t in confirmed_trees)
+        max_age_years = max_age_days / 365.0
+
+        if max_age_years > 3:
+            badge = "Gold"
+        elif max_age_years > 2:
+            badge = "Silver"
+        elif max_age_years > 1:
+            badge = "Bronze"
+        else:
+            badge = None
+
+        leaderboard.append({
+            "name": user.name,
+            "total_trees": total_trees,
+            "total_co2_offset": round(total_co2, 2),
+            "badge": badge
+        })
+
+    # Sort descending by total_trees, then total_co2_offset
+    leaderboard.sort(key=lambda x: (x["total_trees"], x["total_co2_offset"]), reverse=True)
+
+    return jsonify(leaderboard[:5])
+
