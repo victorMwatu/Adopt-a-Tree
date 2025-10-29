@@ -34,7 +34,13 @@ def create_auth_blueprint(mail):
             db.session.add(user)
             db.session.commit()
 
-            return jsonify({"message": "User created successfully"}), 201
+            token = create_access_token(identity=user.id, expires_delta=timedelta(hours=24))
+            return jsonify({
+                "message": "User created successfully",
+                "token": token,
+                "user": {"id": user.id, "name": user.name, "region": user.region, "email": user.email}
+            }), 201
+
         except Exception as e:
             db.session.rollback()
             print(f"Error in signup: {str(e)}") 
