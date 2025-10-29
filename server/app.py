@@ -12,12 +12,15 @@ app = Flask(__name__)
 app.config.from_object(Config)
 CORS(app, resources={
     r"/api/*": {
-        "origins": "*", # NOTE TO TEAM: Change to frontend URL in production
+        "origins": [
+            "https://adopt-a-tree-murex.vercel.app/"
+        ],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
         "expose_headers": ["Content-Type", "Authorization"]
     }
 })
+
 db.init_app(app)
 bcrypt.init_app(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
