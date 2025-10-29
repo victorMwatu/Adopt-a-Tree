@@ -32,6 +32,7 @@ requests = "*"
 transformers = {extras = ["torch"], version = "*"}
 huggingface-hub = {extras = ["inference"], version = "*"}
 python-dotenv = "*"
+flask-mail = "*"
 
 [dev-packages]
 

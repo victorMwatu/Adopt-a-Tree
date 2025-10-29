@@ -10,14 +10,7 @@ load_dotenv()
 
 tree_bp = Blueprint("tree_bp", __name__)
 
-# ================================================================
-# AI API KEY
-# ================================================================
-openai.api_key = os.environ.get("OPENAI_API_KEY")  # Ensure this is set in your environment
-
-# ================================================================
 # Fetch user trees
-# ================================================================
 @tree_bp.route("/api/trees/<int:user_id>", methods=["GET"])
 @jwt_required()
 def get_user_trees(user_id):
