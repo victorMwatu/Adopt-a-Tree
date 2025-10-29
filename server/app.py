@@ -43,7 +43,7 @@ jwt = JWTManager(app)
 migrate = Migrate(app, db)
 
 app.register_blueprint(auth_bp, url_prefix="/api/auth")
-app.register_blueprint(tree_bp)
+app.register_blueprint(tree_bp, url_prefix="/api")
 
 @app.route('/')
 def home():
