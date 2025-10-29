@@ -121,7 +121,7 @@ export default function Home() {
               </h3>
             </div>
             <p className="text-black leading-relaxed">
-              Monitor your tree's growth, CO₂ offset, and climb the leaderboard
+              Monitor your tree&apos;s growth, CO₂ offset, and climb the leaderboard
             </p>
           </div>
             </div>
