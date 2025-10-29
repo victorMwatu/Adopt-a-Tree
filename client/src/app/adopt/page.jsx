@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 // Fetch tree suggestions by region or name
 async function getTreeSuggestions(query) {
   const token = localStorage.getItem("token"); 
-  const res = await fetch("http://localhost:5000/api/tree-suggestions", {
+  const res = await fetch("https://adopt-a-tree.onrender.com/api/tree-suggestions", {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
@@ -25,7 +25,7 @@ async function getTreeSuggestions(query) {
 async function adoptTree(tree) {
   const token = localStorage.getItem("token"); 
   try {
-    const res = await fetch("http://localhost:5000/api/adopt-tree", {
+    const res = await fetch("https://adopt-a-tree.onrender.com/api/adopt-tree", {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
