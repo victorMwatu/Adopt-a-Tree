@@ -27,7 +27,7 @@ export default function Dashboard() {
         const token = localStorage.getItem("token");
 
         //Fetch all trees
-        const res = await fetch(`http://localhost:5000/api/trees/${user.id}`, {
+        const res = await fetch(`https://adopt-a-tree.onrender.com/api/trees/${user.id}`, {
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -55,7 +55,7 @@ export default function Dashboard() {
               const type = insightTypes[i % insightTypes.length];
 
               try {
-                const insightRes = await fetch("http://localhost:5000/api/ai-insight", {
+                const insightRes = await fetch("https://adopt-a-tree.onrender.com/api/ai-insight", {
                   method: "POST",
                   headers: {
                     Authorization: `Bearer ${token}`,
@@ -103,7 +103,7 @@ export default function Dashboard() {
   const handlePlanting = async (treeId) => {
   try {
     const token = localStorage.getItem("token");
-    const res = await fetch(`http://localhost:5000/api/trees/${treeId}/confirm`, {
+    const res = await fetch(`https://adopt-a-tree.onrender.com/api/trees/${treeId}/confirm`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,
