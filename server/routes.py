@@ -13,11 +13,6 @@ tree_bp = Blueprint("tree_bp", __name__)
 @tree_bp.route("/trees/<int:user_id>", methods=["GET"])
 @jwt_required()
 def get_user_trees(user_id):
-    """
-    Returns all trees belonging to the given user_id.
-    Protected by JWT; only the logged-in user can access their trees.
-    Automatically updates growth_stage before returning.
-    """
     current_user_id = get_jwt_identity()
     if current_user_id != user_id:
         return jsonify({"message": "Unauthorized"}), 403
@@ -33,7 +28,7 @@ def get_user_trees(user_id):
         db.session.commit()
 
         age_days = user_tree.get_tree_age_days()
-        progress = min(round((age_days / 1095) * 100, 1), 100) 
+        progress = min(round((age_days / 1095) * 100, 1), 100)
 
         if user_tree.growth_stage.lower() == "seedling":
             icon = "🌱"
@@ -50,6 +45,8 @@ def get_user_trees(user_id):
             "progress": progress,
             "age": age_days,
             "status": user_tree.status,
+            "location": user_tree.location,
+            "nickname": getattr(user_tree, "nickname", None)
         })
 
     return jsonify(updated_trees)

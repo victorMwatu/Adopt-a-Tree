@@ -10,7 +10,7 @@ export default function Dashboard() {
   const [trees, setTrees] = useState([]);
   const [aiTips, setAiTips] = useState([]);
 
-  //Redirect if not authenticated
+  // Redirect if not authenticated
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token || !user) {
@@ -168,23 +168,15 @@ const handleDelete = async (treeId) => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-green-50 ml-64">
         <div className="max-w-7xl mx-auto p-8">
           <div className="space-y-6">
-            {/* ===================== My Trees Section ===================== */}
+            {/* My Trees Section */}
             <div id="my-trees" className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">
-                  My Trees
-                </h2>
-                <a
-                  href="#"
-                  className="text-green-600 text-sm font-medium hover:text-green-700"
-                >
-                  View All →
-                </a>
+                <h2 className="text-xl font-semibold text-gray-900">My Trees</h2>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {trees.length === 0 ? (
-                  <p className="text-gray-500 text-sm">Loading trees...</p>
+                  <p className="text-gray-500 text-sm">No trees yet...</p>
                 ) : (
                   trees.map((tree) => (
                     <div
@@ -193,7 +185,7 @@ const handleDelete = async (treeId) => {
                     >
                       <div className="text-5xl mb-2">{tree.icon}</div>
                       <div className="font-semibold text-green-900 mb-1">
-                        {tree.name}
+                        {tree.nickname || tree.name}
                       </div>
                       <div className="text-xs text-gray-600 mb-2">
                         {tree.growth_stage}
@@ -201,10 +193,15 @@ const handleDelete = async (treeId) => {
                       <div className="bg-gray-200 h-1.5 rounded-full overflow-hidden mb-2">
                         <div
                           className="bg-gradient-to-r from-green-500 to-green-300 h-full rounded-full transition-all"
-                          style={{ width: `${tree.progress}%` }}
+                          style={{
+                            width: `${Math.min(
+                              (tree.age / 1092) * 100,
+                              100
+                            )}%`,
+                          }}
                         />
                       </div>
-                      <small className="text-xs text-gray-600">
+                      <small className="text-xs text-gray-600 mb-2">
                         {tree.age} days old
                       </small>
 
