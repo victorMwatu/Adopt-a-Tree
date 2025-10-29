@@ -14,7 +14,7 @@ export default function ForgotPasswordPage() {
     setMessage("");
 
     try {
-      const res = await fetch("http://127.0.0.1:5000/api/auth/forgotpassword", {
+      const res = await fetch("https://adopt-a-tree.onrender.com/api/auth/forgotpassword", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
