@@ -13,7 +13,7 @@ app.config.from_object(Config)
 CORS(app, resources={
     r"/api/*": {
         "origins": [
-            "https://adopt-a-tree-murex.vercel.app/"
+            "https://adopt-a-tree-murex.vercel.app"
         ],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
