@@ -27,7 +27,7 @@ const Sidebar = () => {
           <Link href="/" className="px-4 py-2 rounded hover:bg-gray-100 text-gray-700">Home</Link>
           <Link href="/dashboard" className="px-4 py-2 rounded hover:bg-gray-100 text-gray-700">Dashboard</Link>
           <Link href="/adopt" className="px-4 py-2 rounded hover:bg-gray-100 text-gray-700">Adopt</Link>
-          <Link href="/about" className="px-4 py-2 rounded hover:bg-gray-100 text-gray-700">Leaderboard</Link>
+          <Link href="/leaderboard" className="px-4 py-2 rounded hover:bg-gray-100 text-gray-700">Leaderboard</Link>
         </nav>
       </div>
 
