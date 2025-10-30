@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const [trees, setTrees] = useState([]);
   const [aiTips, setAiTips] = useState([]);
