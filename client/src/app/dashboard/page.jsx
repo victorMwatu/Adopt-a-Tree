@@ -142,7 +142,7 @@ const handleDelete = async (treeId) => {
 
   try {
     const token = localStorage.getItem("token");
-    const res = await fetch(`http://localhost:5000/api/trees/${treeId}`, {
+    const res = await fetch(`https://adopt-a-tree.onrender.com/api/trees/${treeId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
