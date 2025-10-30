@@ -12,6 +12,7 @@ export default function Dashboard() {
 
   //Redirect if not authenticated
   useEffect(() => {
+    if (loading) return;
     const token = localStorage.getItem("token");
     if (!token || !user) {
       router.push("/auth/login");
